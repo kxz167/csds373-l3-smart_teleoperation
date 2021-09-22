@@ -1,0 +1,3 @@
+<launch>
+	<node name="smart_teleoperation_publisher_node" type="team2_smart_teleoperation_node" pkg="team2_smart_teleoperation" ns="robot0"/>
+</launch>
