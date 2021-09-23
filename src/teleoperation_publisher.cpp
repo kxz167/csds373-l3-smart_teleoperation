@@ -5,6 +5,16 @@
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 
+void robotCommandCallback(const geometry_msgs::Twist::ConstPtr& msg)
+{
+
+}
+
+void lidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
+{
+
+}
+
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
  */
@@ -20,7 +30,7 @@ int main(int argc, char **argv)
    * You must call one of the versions of ros::init() before using any other
    * part of the ROS system.
    */
-  ros::init(argc, argv, "talker");
+  ros::init(argc, argv, "smart_teleoperator");
 
   /**
    * NodeHandle is the main access point to communications with the ROS system.
@@ -46,8 +56,9 @@ int main(int argc, char **argv)
    * than we can send them, the number here specifies how many messages to
    * buffer up before throwing some away.
    */
-  ros::Publisher chatter_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
-
+  ros::Publisher commandPub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
+  ros::Subscriber velocitySub = n.subscribe("des_vel", 1000, robotCommandCallback);
+  ros::Subscriber laserSub = n.subscribe("cmd_vel", 1000, lidarCallback);
   ros::Rate loop_rate(1);
 
   /**
