@@ -7,28 +7,22 @@
 
 void robotCommandCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
-
+  /**
+   * Run each time the robot is issued a command
+   */
 }
 
 void lidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
-
+  /**
+   * Run each time the lidar takes in a reading.
+   */
 }
 
-/**
- * This tutorial demonstrates simple sending of messages over the ROS system.
- */
 int main(int argc, char **argv)
 {
   /**
-   * The ros::init() function needs to see argc and argv so that it can perform
-   * any ROS arguments and name remapping that were provided at the command line.
-   * For programmatic remappings you can use a different version of init() which takes
-   * remappings directly, but for most command-line programs, passing argc and argv is
-   * the easiest way to do it.  The third argument to init() is the name of the node.
-   *
-   * You must call one of the versions of ros::init() before using any other
-   * part of the ROS system.
+   * Initialize ros, name the node
    */
   ros::init(argc, argv, "smart_teleoperator");
 
@@ -45,10 +39,11 @@ int main(int argc, char **argv)
   ros::Publisher commandPub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
   
   /**
-   *
+   * Create the subscribers for  the lidar
    */
   ros::Subscriber velocitySub = n.subscribe("des_vel", 1000, robotCommandCallback);
   ros::Subscriber laserSub = n.subscribe("cmd_vel", 1000, lidarCallback);
+
   /**
    *How often to  run through the loop
    */
