@@ -10,23 +10,28 @@
 // Global Variables:
 ros::Publisher commandPub;
 bool shouldStop = false;
+int failedCalls = 0;      //Number of calls where no robot command has been seen.
+int downTime = 0;
 
 //Constants:
 const float STOP_DIST = 1;
-const float VIEW_ANGLE = 20;
-const float VIEW_PAD = (270 - VIEW_ANGLE) / 2;
+const int VIEW_ANGLE = 20;
+const int VIEW_PAD = (270 - VIEW_ANGLE) / 2;
 
 /**
   * Run each time the robot is issued a command
   */
 void robotCommandCallback(const geometry_msgs::Twist::ConstPtr &msg)
 {
+  failedCalls = 0;
+  downTime = 0;
   //Create a copy of the message:
   geometry_msgs::Twist msg_copy(*msg);
 
   // Determine if we want to override the forward velocity.
   if (shouldStop)
   {
+    ROS_INFO("Robot distance too close, overridden %f to 0.", msg_copy.linear.x);
     msg_copy.linear.x = 0;
   }
 
@@ -73,7 +78,24 @@ int main(int argc, char **argv)
   ros::Subscriber laserSub = n.subscribe("laser_1", 1000, lidarCallback);
   
   //Allow ros to read from subscribers.
-  ros::spin();
+  ROS_INFO("\n==========================================\n=         Robot View Information         =\n==========================================\nRobot viewing angle: %d \nStopping distance: %f\n==========================================",VIEW_ANGLE, STOP_DIST);
+  // Don't need to block.
+  // ros::spin();
+
+  //Define checks
+  ros::Rate loop_rate(10);
+
+  while(ros::ok()){
+    if(++failedCalls > 100){
+      //We have not received any robot commands for 10 seconds.
+      failedCalls = 0;
+      downTime += 10;
+      ROS_WARN("No robot commands received in the previous %d seconds", downTime);
+    }
+
+    ros::spinOnce();
+    loop_rate.sleep();
+  }
 
   return 0;
 }
