@@ -7,37 +7,44 @@
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 
+// Global Variables:
 ros::Publisher commandPub;
-
 bool shouldStop = false;
 
+//Constants:
+const float STOP_DIST = 1;
+const float VIEW_ANGLE = 20;
+const float VIEW_PAD = (270 - VIEW_ANGLE) / 2;
+
+/**
+  * Run each time the robot is issued a command
+  */
 void robotCommandCallback(const geometry_msgs::Twist::ConstPtr &msg)
 {
-  /**
-   * Run each time the robot is issued a command
-   */
-
+  //Create a copy of the message:
   geometry_msgs::Twist msg_copy(*msg);
 
+  // Determine if we want to override the forward velocity.
   if (shouldStop)
   {
     msg_copy.linear.x = 0;
   }
 
+  //Publish the message.
   commandPub.publish(msg_copy);
 }
 
-const float STOP_DIST = 1;
-const float VIEW_ANGLE = 20;
-const float VIEW_PAD = (270 - VIEW_ANGLE) / 2;
 
-void lidarCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
-{
-  /**
+/**
    * Run each time the lidar takes in a reading.
    */
-  std::vector<float> current_ranges = msg->ranges;
-  shouldStop = *std::min_element(current_ranges.begin() + VIEW_PAD, current_ranges.end() - VIEW_PAD) < STOP_DIST;
+void lidarCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
+{
+  //Grab the set of ranges from the message.
+  std::vector<float> current_ranges = msg->ranges; //Grab the ranges
+
+  //Determine if minimum element in desired view range is less than the stopping distance.
+  shouldStop = *std::min_element(current_ranges.begin() + VIEW_PAD, current_ranges.end() - VIEW_PAD) < STOP_DIST; 
 }
 
 int main(int argc, char **argv)
@@ -64,40 +71,9 @@ int main(int argc, char **argv)
    */
   ros::Subscriber velocitySub = n.subscribe("des_vel", 1000, robotCommandCallback);
   ros::Subscriber laserSub = n.subscribe("laser_1", 1000, lidarCallback);
-
-  /**
-   *How often to  run through the loop
-   */
-  ros::Rate loop_rate(1);
-
-  /**
-   * Loop through sending messages
-   */
-  while (ros::ok())
-  {
-    /**
-     * Create the geometry_msgs.
-     */
-    /*
-    geometry_msgs::Twist msg;
-
-    msg.linear.x = 0;
-    msg.linear.y = 0;
-    msg.linear.z = 0;
-    
-    msg.angular.x = 0;
-    msg.angular.y = 0;
-    msg.angular.z = 0;
-    
-    /**
-     * Publish to the publisher
-     */
-    //commandPub.publish(msg);
-
-    ros::spinOnce();
-
-    loop_rate.sleep();
-  }
+  
+  //Allow ros to read from subscribers.
+  ros::spin();
 
   return 0;
 }
