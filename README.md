@@ -48,21 +48,26 @@ From the `catkin_ws` directory, build the package (I just build all packages):
 ```
 catkin_make
 ```
-
 Source the devel:
 ```
 source devel/setup.bash
 ```
-Running the node:
+#### Running our smart interceptor:
+Running the smart teleopoeration node without the simulator:
 ```
-roslaunch team2_smart_teleoperation  [options]
+roslaunch team2_smart_teleoperation launch_st_publisher.launch [options]
 ```
-NOTE: depending on other package names from other students, pacakge direction may not work properly. Make sure to clear out other packages named navvis_description. In the future I will make sure and add my student ID to the package name.\
-\
 Options:
-- `use_xacro:= [true/false]` - Use the xacro file (true) or the urdf file (false : default)
-- `jsp_gui:= [true/false]` - Utilize the Joint State Processor Gui to command wheels (true : default) or "render" vehicles through single joint msg (false)
+- `ns:=<namespace_for_the_robot[default=robot0]>` - Let's you define the namespace for which the smart teleoperation node will be operating on (which robot).
 
-### Notes:
-- For the full functionality and to see the final robot, the `use_xacro:=true` flag should be used. Utilizing the old URDF file will not show the completed robot.
-- You will need to rename the downloaded folder to navvis_descriptions in order to match the directory naming scheme due to github package naming conventions. In terms of running, this does not seem to impact running the code.
+Running the smart teleoperation node in addition to the simulator:
+```
+roslaunch team2_smart_teleoperation launch_stp_stdr.launch [options]
+```
+Options:
+- `ns:=<namespace_for_the_robot[default=robot0]>` - Let's you define the namespace for which the smart teleoperation node will be operating on (which robot).
+
+By defining the name space for the smart teleoperation nodes, you are able to control multiple robots on one simulation.
+#### Setup of robots:
+Similar to the assignment:
+- In the case of robots being unresponsive, verify topic naming is aligned with the assignment.
