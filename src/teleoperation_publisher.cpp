@@ -31,7 +31,7 @@ void robotCommandCallback(const geometry_msgs::Twist::ConstPtr &msg)
   // Determine if we want to override the forward velocity.
   if (shouldStop)
   {
-    ROS_INFO("Robot distance too close, overridden %f to 0.", msg_copy.linear.x);
+    ROS_WARN("Robot distance too close, overridden %f to 0.", msg_copy.linear.x);
     msg_copy.linear.x = 0;
   }
 
